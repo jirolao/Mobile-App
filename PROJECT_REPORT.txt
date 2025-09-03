@@ -1,0 +1,13 @@
+Detected Project Facts
+- is_expo: True
+- is_bare: False
+- has_android_native: False
+- uses_gradle_kts: False
+- has_ios: False
+- package_manager: npm
+- expo_sdk: ~53.0.22
+Name: pavillar-app
+Version: 1.0.0
+Dependency count: 26
+Dev dependency count: 5
+Expo SDK (from package.json): ~53.0.22
