@@ -1,29 +1,29 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Drawer } from "expo-router/drawer";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Drawer
+      screenOptions={{
+        headerStyle: { backgroundColor: "#8d977f" }, // earthy green
+        headerTintColor: "#fff",
+        headerTitleStyle: { fontWeight: "bold" },
+        drawerActiveTintColor: "#fff",
+        drawerActiveBackgroundColor: "#8d977f",
+        drawerLabelStyle: { fontSize: 16 },
+      }}
+    >
+      <Drawer.Screen name="index" options={{ title: "Home" }} />
+      <Drawer.Screen name="explore" options={{ title: "Explore" }} />
+      <Drawer.Screen name="spotlogin" options={{ title: "Spotify Log In" }} />
+      <Drawer.Screen name="spotsign" options={{ title: "Spotify Sign Up" }} />
+      <Drawer.Screen name="spotplaylist" options={{ title: "Spotify Playlists" }} />
+      <Drawer.Screen name="componentshowcase" options={{ title: "Components" }} />
+
+      {/* Hide Not Found route from drawer */}
+      <Drawer.Screen
+        name="+not-found"
+        options={{ href: null, drawerItemStyle: { display: "none" } }}
+      />
+    </Drawer>
   );
 }
