@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -9,64 +9,84 @@ import {
   Image,
   ScrollView,
   Platform,
+  Alert,
 } from "react-native";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import SpotLogo from "@/assets/images/spotlogo.jpg";
 
 export default function SpotifyLoginScreen() {
-  const router = useRouter(); // ✅ Hook gives us navigation methods
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    if (username.length < 3 || password.length < 3) {
+      Alert.alert("Error", "Username and password must be at least 3 characters.");
+      return;
+    }
+    const stored = await AsyncStorage.getItem("userCreds");
+    if (!stored) {
+      Alert.alert("Error", "No account found. Please sign up first.");
+      return;
+    }
+    const { username: storedUsername, password: storedPassword } = JSON.parse(stored);
+    if (username !== storedUsername || password !== storedPassword) {
+      Alert.alert("Error", "Invalid username or password.");
+      return;
+    }
+    await AsyncStorage.setItem("userToken", "demo");
+    router.replace("/spotplaylist");
+  };
+
+  // This is the handler for the sign-up text link
+  const handleGoToSignUp = () => {
+    router.push("/spotsign");
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Logo + Title */}
       <View style={styles.logoContainer}>
         <Image source={SpotLogo} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>Spotify</Text>
       </View>
-
-      {/* Input Fields */}
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email or username"
           placeholderTextColor="#aaa"
           style={styles.input}
+          value={username}
+          onChangeText={setUsername}
         />
         <TextInput
           placeholder="Password"
           placeholderTextColor="#aaa"
           secureTextEntry
           style={styles.input}
+          value={password}
+          onChangeText={setPassword}
         />
-
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Log In</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.link}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Social Login */}
       <View style={styles.socialIconButtons}>
         <TouchableOpacity style={[styles.iconButton, styles.google]}>
           <AntDesign name="google" size={24} color="#000" />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.iconButton, styles.facebook, styles.iconButtonLast]}
-        >
+        <TouchableOpacity style={[styles.iconButton, styles.facebook, styles.iconButtonLast]}>
           <FontAwesome name="facebook" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-
-      {/* Footer with Sign Up redirect */}
       <Text style={styles.signup}>
         Don’t have an account?{" "}
         <Text
           style={styles.link}
-          onPress={() => router.push("/spotsign")}
+          onPress={handleGoToSignUp} // <-- Ensure this uses the new handler
         >
           Sign up for Spotify
         </Text>
@@ -83,7 +103,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: "center",
     minHeight: "100%",
-    justifyContent: "space-between", // spreads content vertically
+    justifyContent: "space-between",
   },
   logoContainer: {
     alignItems: "center",
