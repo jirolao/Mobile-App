@@ -42,14 +42,14 @@ export default function HomeScreen() {
           style={[styles.navButton, { backgroundColor: "#8d977f" }]} // sage green
           onPress={() => router.push("/spotlogin")}
         >
-          <Text style={styles.navButtonText}>Spotify Login</Text>
+          <Text style={styles.navButtonText}>Spotify</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.navButton, { backgroundColor: "#b9a066" }]} // muted golden brown
           onPress={() => router.push("/componentshowcase")}
         >
-          <Text style={styles.navButtonText}>Trial Page</Text>
+          <Text style={styles.navButtonText}>Random Buttons</Text>
         </TouchableOpacity>
       </View>
 

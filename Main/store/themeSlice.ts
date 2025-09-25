@@ -1,15 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export type ThemeType = "light" | "dark";
+export type ThemeType = "light" | "dark" | "custom";
 
 interface ThemeState {
-  theme: ThemeType;       // global theme
-  customColor: string | null; // optional color for global theme
+  theme: ThemeType;
+  accent: string;
 }
 
 const initialState: ThemeState = {
   theme: "light",
-  customColor: null,
+  accent: "#E91E63",
 };
 
 const themeSlice = createSlice({
@@ -22,11 +22,15 @@ const themeSlice = createSlice({
     setTheme: (state, action) => {
       state.theme = action.payload;
     },
-    setCustomColor: (state, action) => {
-      state.customColor = action.payload;
+    setAccent: (state, action) => {
+      state.accent = action.payload;
+      state.theme = "custom";
+    },
+    hydrateTheme: (state, action) => {
+      return { ...state, ...action.payload };
     },
   },
 });
 
-export const { toggleTheme, setTheme, setCustomColor } = themeSlice.actions;
+export const { toggleTheme, setTheme, setAccent, hydrateTheme } = themeSlice.actions;
 export default themeSlice.reducer;

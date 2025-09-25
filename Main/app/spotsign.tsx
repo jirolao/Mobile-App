@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Image,
@@ -13,8 +12,10 @@ import {
 } from "react-native";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import SpotLogo from "@/assets/images/spotlogo.jpg";
+import ShakeInput from "../components/animations/ShakeInput";
+import AnimatedFadeIn from "../components/animations/AnimatedFadeIn";
+import ProfilePreview from "../components/animations/ProfilePreview";
 
 export default function SpotifySignUpScreen() {
   const router = useRouter();
@@ -22,21 +23,39 @@ export default function SpotifySignUpScreen() {
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [gender, setGender] = useState("");
+  const [email, setEmail] = useState("");
+  const [genre, setGenre] = useState("");
   const [error, setError] = useState("");
+  const [shake, setShake] = useState({
+    firstName: false,
+    lastName: false,
+    username: false,
+    password: false,
+    email: false,
+    genre: false,
+  });
 
   const handleSignUp = async () => {
-    if (
-      firstName.trim().length < 2 ||
-      lastName.trim().length < 2 ||
-      username.length < 3 ||
-      password.length < 3 ||
-      !gender
-    ) {
+    let invalid = {};
+    if (firstName.trim().length < 2) invalid.firstName = true;
+    if (lastName.trim().length < 2) invalid.lastName = true;
+    if (username.length < 3) invalid.username = true;
+    if (password.length < 3) invalid.password = true;
+    if (email.length < 3 || !email.includes("@")) invalid.email = true;
+    if (!genre) invalid.genre = true;
+
+    if (Object.keys(invalid).length > 0) {
       setError("Please complete all fields with valid values.");
+      setShake((prev) => ({ ...prev, ...invalid }));
+      setTimeout(() => {
+        setShake((prev) => {
+          let cleared = {};
+          for (const k in prev) cleared[k] = false;
+          return cleared;
+        });
+      }, 600);
       return;
     }
-    // Store as single user object for demo
     await AsyncStorage.setItem(
       "userCreds",
       JSON.stringify({
@@ -44,11 +63,11 @@ export default function SpotifySignUpScreen() {
         lastName,
         username,
         password,
-        gender,
+        email,
+        genre,
       })
     );
     setError("");
-    // Show notification and redirect to login
     Alert.alert("Account created!", "You can now log in.", [
       {
         text: "OK",
@@ -65,51 +84,71 @@ export default function SpotifySignUpScreen() {
       </View>
       <View style={styles.inputContainer}>
         {error ? (
-          <Text style={{ color: "red", marginBottom: 10, textAlign: "center" }}>
-            {error}
-          </Text>
+          <AnimatedFadeIn>
+            <Text style={{ color: "red", marginBottom: 10, textAlign: "center" }}>
+              {error}
+            </Text>
+          </AnimatedFadeIn>
         ) : null}
-        <TextInput
+        <ShakeInput
           placeholder="First Name"
           placeholderTextColor="#aaa"
           style={styles.input}
           value={firstName}
           onChangeText={setFirstName}
+          hasError={shake.firstName}
         />
-        <TextInput
+        <ShakeInput
           placeholder="Last Name"
           placeholderTextColor="#aaa"
           style={styles.input}
           value={lastName}
           onChangeText={setLastName}
+          hasError={shake.lastName}
         />
-        <TextInput
-          placeholder="Email or Username"
+        <ShakeInput
+          placeholder="Username"
           placeholderTextColor="#aaa"
           style={styles.input}
           value={username}
           onChangeText={setUsername}
+          hasError={shake.username}
         />
-        <TextInput
+        <ShakeInput
           placeholder="Password"
           placeholderTextColor="#aaa"
           secureTextEntry
           style={styles.input}
           value={password}
           onChangeText={setPassword}
+          hasError={shake.password}
         />
-        <TextInput
-          placeholder="Gender (e.g. Male, Female, Other)"
+        <ShakeInput
+          placeholder="Email"
           placeholderTextColor="#aaa"
           style={styles.input}
-          value={gender}
-          onChangeText={setGender}
+          value={email}
+          onChangeText={setEmail}
+          hasError={shake.email}
+          keyboardType="email-address"
+        />
+        <ShakeInput
+          placeholder="Genre (e.g. Pop, Jazz, Rock, etc.)"
+          placeholderTextColor="#aaa"
+          style={styles.input}
+          value={genre}
+          onChangeText={setGenre}
+          hasError={shake.genre}
         />
 
         <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
           <Text style={styles.signupButtonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Live Profile Preview */}
+      <ProfilePreview username={username} email={email} genre={genre} />
+
       <View style={styles.socialIconButtons}>
         <TouchableOpacity style={[styles.iconButton, styles.google]}>
           <AntDesign name="google" size={24} color="#000" />
@@ -120,10 +159,7 @@ export default function SpotifySignUpScreen() {
       </View>
       <Text style={styles.login}>
         Already have an account?{" "}
-        <Text
-          style={styles.link}
-          onPress={() => router.push("/spotlogin")}
-        >
+        <Text style={styles.link} onPress={() => router.push("/spotlogin")}>
           Log in to Spotify
         </Text>
       </Text>

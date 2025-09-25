@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Image,
@@ -13,37 +12,58 @@ import {
 } from "react-native";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import SpotLogo from "@/assets/images/spotlogo.jpg";
+import ShakeInput from "../components/animations/ShakeInput";
+import AnimatedFadeIn from "../components/animations/AnimatedFadeIn";
 
 export default function SpotifyLoginScreen() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [shakeUser, setShakeUser] = useState(false);
+  const [shakePass, setShakePass] = useState(false);
 
   const handleLogin = async () => {
-    if (username.length < 3 || password.length < 3) {
-      Alert.alert("Error", "Username and password must be at least 3 characters.");
+    let invalid = false;
+    if (username.length < 3) {
+      setShakeUser(true);
+      invalid = true;
+    }
+    if (password.length < 3) {
+      setShakePass(true);
+      invalid = true;
+    }
+    if (invalid) {
+      setError("Username and password must be at least 3 characters.");
+      setTimeout(() => {
+        setShakeUser(false);
+        setShakePass(false);
+      }, 600);
       return;
     }
     const stored = await AsyncStorage.getItem("userCreds");
     if (!stored) {
-      Alert.alert("Error", "No account found. Please sign up first.");
+      setError("No account found. Please sign up first.");
       return;
     }
     const { username: storedUsername, password: storedPassword } = JSON.parse(stored);
     if (username !== storedUsername || password !== storedPassword) {
-      Alert.alert("Error", "Invalid username or password.");
+      setError("Invalid username or password.");
+      setShakeUser(true);
+      setShakePass(true);
+      setTimeout(() => {
+        setShakeUser(false);
+        setShakePass(false);
+      }, 600);
       return;
     }
+    setError("");
     await AsyncStorage.setItem("userToken", "demo");
     router.replace("/spotplaylist");
   };
 
-  // This is the handler for the sign-up text link
-  const handleGoToSignUp = () => {
-    router.push("/spotsign");
-  };
+  const handleGoToSignUp = () => router.push("/spotsign");
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -52,20 +72,29 @@ export default function SpotifyLoginScreen() {
         <Text style={styles.title}>Spotify</Text>
       </View>
       <View style={styles.inputContainer}>
-        <TextInput
+        {error ? (
+          <AnimatedFadeIn>
+            <Text style={{ color: "red", marginBottom: 10, textAlign: "center" }}>
+              {error}
+            </Text>
+          </AnimatedFadeIn>
+        ) : null}
+        <ShakeInput
           placeholder="Email or username"
           placeholderTextColor="#aaa"
           style={styles.input}
           value={username}
           onChangeText={setUsername}
+          hasError={shakeUser}
         />
-        <TextInput
+        <ShakeInput
           placeholder="Password"
           placeholderTextColor="#aaa"
           secureTextEntry
           style={styles.input}
           value={password}
           onChangeText={setPassword}
+          hasError={shakePass}
         />
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Log In</Text>
@@ -84,10 +113,7 @@ export default function SpotifyLoginScreen() {
       </View>
       <Text style={styles.signup}>
         Don’t have an account?{" "}
-        <Text
-          style={styles.link}
-          onPress={handleGoToSignUp} // <-- Ensure this uses the new handler
-        >
+        <Text style={styles.link} onPress={handleGoToSignUp}>
           Sign up for Spotify
         </Text>
       </Text>

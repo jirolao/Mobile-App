@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useNavigation } from "expo-router";
@@ -9,20 +9,15 @@ const defaultAvatar = "https://ui-avatars.com/api/?name=User";
 export default function SpotPlaylist() {
   const navigation = useNavigation();
   const user = useSelector((state: RootState) => state.user);
-  const theme = useSelector((state: RootState) => state.theme);
-  const isDark = theme.theme === "dark";
-  const bgColor = theme.customColor || (isDark ? "#000000" : "#ffffff");
-  const textColor = isDark ? "#fff" : "#000";
 
   // Dropdown state
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
+    <ScrollView contentContainerStyle={[styles.container]}>
       {/* Header with avatar */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: textColor }]}>Spotify Playlists</Text>
-
+        <Text style={styles.headerTitle}>Spotify Playlists</Text>
         {/* Avatar with dropdown */}
         <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
           <Image
@@ -34,7 +29,7 @@ export default function SpotPlaylist() {
 
       {/* Mini Dropdown */}
       {dropdownVisible && (
-        <View style={[styles.dropdown, { backgroundColor: isDark ? "#222" : "#eee" }]}>
+        <View style={styles.dropdown}>
           <TouchableOpacity
             style={styles.dropdownItem}
             onPress={() => {
@@ -42,31 +37,35 @@ export default function SpotPlaylist() {
               navigation.navigate("Profile");
             }}
           >
-            <Text style={{ color: isDark ? "#fff" : "#000", fontWeight: "bold" }}>Profile</Text>
+            <Text style={styles.dropdownText}>Profile</Text>
           </TouchableOpacity>
-          {/* You can add more items here later */}
         </View>
       )}
 
-      {/* Spotify content */}
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: textColor }}>Your Spotify playlists go here.</Text>
+      {/* Spotify content (centered) */}
+      <View style={styles.content}>
+        <Text style={styles.contentText}>Your Spotify playlists go here.</Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flexGrow: 1,
+    minHeight: "100%",
+    backgroundColor: "#000", // Always black background
+    justifyContent: "flex-start",
+    padding: 20,
+    paddingTop: 60,
+  },
   header: {
-    paddingTop: 46,
-    paddingHorizontal: 20,
-    paddingBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 40,
   },
-  headerTitle: { fontSize: 24, fontWeight: "bold" },
+  headerTitle: { fontSize: 24, fontWeight: "bold", color: "#fff" }, // Always white text
   avatar: {
     width: 36,
     height: 36,
@@ -77,11 +76,12 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: "absolute",
-    top: 70, // adjust based on header height
+    top: 70,
     right: 20,
     borderRadius: 8,
     paddingVertical: 8,
     minWidth: 120,
+    backgroundColor: "#222", // Always dark
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 5,
@@ -91,5 +91,18 @@ const styles = StyleSheet.create({
   dropdownItem: {
     paddingVertical: 10,
     paddingHorizontal: 12,
+  },
+  dropdownText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  content: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 400,
+  },
+  contentText: {
+    color: "#fff", // Always white text
   },
 });
