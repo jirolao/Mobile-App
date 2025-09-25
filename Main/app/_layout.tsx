@@ -71,6 +71,12 @@ function ThemedDrawer() {
         <Drawer.Screen name="explore" options={{ title: "Explore" }} />
         <Drawer.Screen name="spotlogin" options={{ title: "Spotify" }} />
         <Drawer.Screen name="componentshowcase" options={{ title: "Random Buttons" }} />
+        <Drawer.Screen name="camera/CameraScreen" options={{ title: "Camera" }} />
+
+        {/* Hide these screens from the drawer, but keep them available for navigation */}
+        <Drawer.Screen name="camera/EditTools" options={{ drawerItemStyle: { display: "none" } }} />
+        <Drawer.Screen name="camera/FilterPreview" options={{ drawerItemStyle: { display: "none" } }} />
+
         <Drawer.Screen name="spotsign" options={{ drawerItemStyle: { display: "none" } }} />
         <Drawer.Screen name="spotplaylist" options={{ drawerItemStyle: { display: "none" } }} />
         <Drawer.Screen name="Profile" options={{ drawerItemStyle: { display: "none" } }} />
