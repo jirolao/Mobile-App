@@ -1,4 +1,8 @@
-45# Welcome to your Expo app 👋
+Welcome! This is a Mobile App that I created for fun.   
+   For the framework Im using Expo on React Native.
+      The IDE Im using is Android Studio.
+         As for the languages I used a mixture of Typescript and Javascript.
+
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
