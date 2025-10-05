@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { updateUser } from "@/store/userSlice";
 import SpotLogo from "@/assets/images/spotlogo.jpg";
 import ShakeInput from "../components/animations/ShakeInput";
 import AnimatedFadeIn from "../components/animations/AnimatedFadeIn";
@@ -19,6 +21,8 @@ import ProfilePreview from "../components/animations/ProfilePreview";
 
 export default function SpotifySignUpScreen() {
   const router = useRouter();
+  const dispatch = useDispatch();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -56,6 +60,7 @@ export default function SpotifySignUpScreen() {
       }, 600);
       return;
     }
+
     await AsyncStorage.setItem(
       "userCreds",
       JSON.stringify({
@@ -67,6 +72,9 @@ export default function SpotifySignUpScreen() {
         genre,
       })
     );
+
+    dispatch(updateUser({ firstName, lastName, username, email, genre }));
+
     setError("");
     Alert.alert("Account created!", "You can now log in.", [
       {
@@ -146,7 +154,6 @@ export default function SpotifySignUpScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Live Profile Preview */}
       <ProfilePreview username={username} email={email} genre={genre} />
 
       <View style={styles.socialIconButtons}>

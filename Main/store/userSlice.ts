@@ -3,9 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   firstName: "",
   lastName: "",
-  gender: "",
+  username: "",      //
   email: "",
-  profileImage: "", // Ready for future upload
+  genre: "",         //
+  profileImage: "",  //
 };
 
 const userSlice = createSlice({
